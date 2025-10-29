@@ -1,0 +1,516 @@
+/* ============================================================
+   ESTILO GENERAL 
+   ============================================================ */
+:root {
+  --beat-blue: rgb(44, 179, 255);   
+  --beat-coral: rgb(255, 255, 255); /* bordes/botones */
+  --beat-gray: #000000;             /* Fondo principal */
+  --beat-light: #e9e9e9;
+  --beat-shadow: rgba(0, 0, 0, 0.3);
+}
+
+body {
+  background-color: #161616;
+  color: #fcfcfc;
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+  background-color: var(--beat-gray) !important;
+  box-shadow: 0 2px 6px var(--beat-shadow);
+}
+
+.navbar-brand img {
+  transition: transform 0.3s ease;
+}
+
+.navbar-brand img:hover {
+  transform: rotate(-5deg) scale(1.05);
+}
+
+.nav-link,
+.dropdown-item {
+  font-weight: 500;
+  color: var(--beat-light) !important;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover,
+.dropdown-item:hover {
+  color: var(--beat-coral) !important;
+}
+
+/* ============================================================
+   CARRUSEL PRINCIPAL
+   ============================================================ */
+.carousel-item img {
+  height: 480px;
+  object-fit: cover;
+  filter: brightness(70%) contrast(1.1);
+}
+
+.carousel-caption {
+  background-color: rgba(0, 0, 0, 0.55);
+  border-left: 4px solid var(--beat-coral);
+  padding: 15px 25px;
+  border-radius: 8px;
+}
+
+.carousel-caption h3 {
+  color: var(--beat-blue);
+  font-weight: 600;
+}
+
+/* ============================================================
+   CUADRO DE BIENVENIDA
+   ============================================================ */
+.welcome-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 40px 30px;
+  max-width: 800px;
+  margin: 0 auto 50px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  animation: fadeInUp 1s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   TÍTULOS DE SECCIÓN 
+   ============================================================ */
+.section-title {
+  font-weight: 600;
+  color: #f5f5f5;
+  letter-spacing: 1px;
+  text-align: center;
+  position: relative;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--beat-blue), var(--beat-coral));
+  box-shadow: 0 0 8px rgba(44, 179, 255, 0.4);
+}
+
+/* ============================================================
+   PRODUCTOS / OFERTAS
+   ============================================================ */
+.card {
+  background-color: #131313;
+  border: none;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  color: #fff;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px var(--beat-shadow);
+}
+
+.card img {
+  height: 220px;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+}
+
+/* Títulos de productos */
+.card .card-title {
+  color: var(--beat-blue) !important;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* Precios */
+.card-text strong {
+  color: #fff;
+}
+
+.precio-oferta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.precio-anterior {
+  color: #ff4b4b;
+  text-decoration: line-through;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.precio-descuento {
+  color: #e7a75c;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* ============================================================
+   FORMULARIOS DE AUTENTICACIÓN (Login y Registro)
+   ============================================================ */
+.auth-container {
+  max-width: 900px;
+  margin: 4rem auto;
+  padding: 2rem;
+}
+
+.auth-form {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 40px 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  animation: fadeInUp 0.8s ease;
+}
+
+/* Títulos */
+.auth-form h2 {
+  color: var(--beat-blue);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Etiquetas y campos */
+.auth-form .form-label {
+  color: #dcdcdc;
+  font-weight: 500;
+}
+
+.auth-form .form-control,
+.auth-form select.form-select {
+  background-color: #1e1e1e;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 8px;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.auth-form .form-control:focus,
+.auth-form select.form-select:focus {
+  border-color: var(--beat-blue);
+  box-shadow: 0 0 6px rgba(44, 179, 255, 0.4);
+  outline: none;
+}
+
+/* Placeholders */
+.auth-form ::placeholder {
+  color: #b3b3b3;
+  opacity: 0.85;
+}
+
+.auth-form select.form-select option {
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+/* Botón */
+.auth-form button {
+  background-color: var(--beat-blue);
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.auth-form button:hover {
+  background-color: #3bc2ff;
+  transform: translateY(-2px);
+}
+
+/* Enlaces */
+.auth-form a {
+  color: var(--beat-blue);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.auth-form a:hover {
+  color: #3bc2ff;
+}
+
+/* ============================================================
+   PERFIL DE USUARIO 
+   ============================================================ */
+
+.perfil-container {
+  max-width: 900px;
+  margin: 4rem auto;
+  padding: 2rem;
+}
+
+.perfil-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  padding: 2rem;
+}
+
+/* Título principal */
+.perfil-titulo {
+  color: var(--beat-blue);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Subtítulos */
+.perfil-subtitulo {
+  color: #eaeaea;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* Nombre y apodo */
+.perfil-nombre {
+  color: #fff;
+  font-weight: 600;
+}
+
+.perfil-apodo {
+  color: #7fd6ff;
+  font-style: italic;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Listas de información */
+.perfil-info {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.perfil-info li {
+  margin-bottom: 0.5rem;
+  color: #e6e6e6;
+  font-size: 0.95rem;
+}
+
+/* Texto de historial vacío */
+.perfil-vacio {
+  color: #b3b3b3;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Botón de cerrar sesión */
+button.btn-danger {
+  background-color: #e63946;
+  border: none;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button.btn-danger:hover {
+  background-color: #ff5c5c;
+  transform: translateY(-2px);
+}
+
+/* Animación */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   CARRITO DE COMPRAS
+   ============================================================ */
+.table {
+  background-color: #181818;
+  color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table thead {
+  background: var(--beat-blue);
+  color: white !important;
+}
+
+.btn-success { background-color: var(--beat-blue); border: none; }
+.btn-danger  { background-color: #e63946; border: none; }
+
+/* ============================================================
+   MARCAS
+   ============================================================ */
+.marcas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.marca-tarjeta {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 15px;
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.03);
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marca-tarjeta img {
+  max-width: 80px;
+  filter: brightness(90%) grayscale(80%);
+  transition: all 0.3s ease;
+}
+
+.marca-tarjeta:hover {
+  transform: scale(1.07);
+  box-shadow: 0 0 15px rgba(44, 179, 255, 0.3);
+}
+
+.marca-tarjeta:hover img {
+  filter: brightness(115%) grayscale(0%);
+}
+
+/* ============================================================
+   ANIMACIÓN BOTÓN "AGREGAR AL CARRITO"
+   ============================================================ */
+@keyframes cartPop {
+  0%   { transform: scale(1); box-shadow: 0 0 0 transparent; }
+  30%  { transform: scale(1.15); box-shadow: 0 0 15px var(--beat-coral); }
+  60%  { transform: scale(0.95); }
+  100% { transform: scale(1); box-shadow: 0 0 0 transparent; }
+}
+
+.cart-animate { animation: cartPop 0.4s ease; }
+
+/* ============================================================
+   TOAST NOTIFICACIÓN 
+   ============================================================ */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;     
+  right: 1.5rem;      
+  z-index: 9999;
+}
+
+.toast {
+  background-color: rgba(0, 0, 0, 0.88) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--beat-blue);
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  box-shadow: 0 0 10px rgba(44, 179, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.toast-header {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toast:hover {
+  transform: scale(1.03);
+}
+
+/* ============================================================
+   DETALLE DE PRODUCTO
+   ============================================================ */
+.producto-detalle h2 {
+  color: var(--beat-blue) !important;
+  font-weight: 700;
+}
+
+.producto-detalle p {
+  color: #fff;
+  opacity: 0.9;
+}
+
+.precio-detalle {
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  background-color: var(--beat-gray);
+  color: #525252;
+  text-align: center;
+  padding: 25px 0;
+  font-size: 0.9rem;
+  border-top: 2px solid var(--beat-coral);
+}
+
+footer a {
+  color: var(--beat-blue);
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: var(--beat-coral);
+}
+
+/* ============================================================
+   LAYOUT GENERAL
+   ============================================================ */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   ENLACES DE PRODUCTOS
+   ============================================================ */
+.nombre-producto {
+  color: var(--beat-blue) !important;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.nombre-producto:hover {
+  color: #73d4ff !important;
+  text-decoration: none;
+}
