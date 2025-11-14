@@ -5,90 +5,120 @@ import com.beatstore.usuarios.dto.UsuarioRegisterDTO;
 import com.beatstore.usuarios.dto.UsuarioResponse;
 import com.beatstore.usuarios.model.Usuario;
 import com.beatstore.usuarios.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    // Registrar nuevo usuario
-    public UsuarioResponse registrar(UsuarioRegisterDTO req) {
+    public UsuarioService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
 
-        if (usuarioRepository.existsByEmail(req.getEmail())) {
+    // REGISTRAR USUARIO
+    public UsuarioResponse register(UsuarioRegisterDTO dto) {
+
+        // EMAIL repetido
+        if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("El correo ya está registrado");
         }
 
-        if (usuarioRepository.existsByRut(req.getRut())) {
+        // RUT repetido
+        if (usuarioRepository.existsByRut(dto.getRut())) {
             throw new RuntimeException("El RUT ya está registrado");
         }
 
-        Usuario nuevo = Usuario.builder()
-                .nombre(req.getNombre())
-                .apodo(req.getApodo())
-                .rut(req.getRut())
-                .telefono(req.getTelefono())
-                .email(req.getEmail())
-                .region(req.getRegion())
-                .ciudad(req.getCiudad())
-                .calle(req.getCalle())
-                .numeroDireccion(req.getNumeroDireccion())
-                .password(req.getPassword()) // Luego se puede encriptar
-                .build();
+        Usuario usuario = new Usuario();
+        usuario.setNombre(dto.getNombre());
+        usuario.setApodo(dto.getApodo());
+        usuario.setRut(dto.getRut());
+        usuario.setEmail(dto.getEmail());
+        usuario.setPassword(dto.getPassword());
+        usuario.setTelefono(dto.getTelefono());
+        usuario.setRegion(dto.getRegion());
+        usuario.setCiudad(dto.getCiudad());
+        usuario.setCalle(dto.getCalle());
+        usuario.setNumeroDireccion(dto.getNumeroDireccion());
 
-        usuarioRepository.save(nuevo);
+        Usuario guardado = usuarioRepository.save(usuario);
 
-        return mapToResponse(nuevo);
+        return UsuarioResponse.from(guardado);
     }
 
-    // Login
-    public UsuarioResponse login(UsuarioLoginRequest req) {
+    // LOGIN
+    public UsuarioResponse login(UsuarioLoginRequest dto) {
 
-        Usuario usuario = usuarioRepository.findByEmail(req.getEmail())
+        Usuario usuario = usuarioRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (!usuario.getPassword().equals(req.getPassword())) {
+        // Evitar NullPointerException
+        if (usuario.getPassword() == null || !usuario.getPassword().equals(dto.getPassword())) {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        return mapToResponse(usuario);
+        return UsuarioResponse.from(usuario);
     }
 
-    // Buscar por ID
-    public UsuarioResponse buscarPorId(Long id) {
-        Usuario u = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        return mapToResponse(u);
-    }
-
-    // Listar todos
-    public List<UsuarioResponse> listarTodos() {
+    // LISTAR TODOS
+    public List<UsuarioResponse> findAll() {
         return usuarioRepository.findAll()
                 .stream()
-                .map(this::mapToResponse)
-                .toList();
+                .map(UsuarioResponse::from)
+                .collect(Collectors.toList());
     }
 
-    // Convertir entidad → DTO
-    private UsuarioResponse mapToResponse(Usuario u) {
-        return UsuarioResponse.builder()
-                .id(u.getId())
-                .nombre(u.getNombre())
-                .apodo(u.getApodo())
-                .email(u.getEmail())
-                .rut(u.getRut())
-                .telefono(u.getTelefono())
-                .region(u.getRegion())
-                .ciudad(u.getCiudad())
-                .calle(u.getCalle())
-                .numeroDireccion(u.getNumeroDireccion())
-                .build();
+    // BUSCAR POR ID
+    public UsuarioResponse findById(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        return UsuarioResponse.from(usuario);
+    }
+
+    // ACTUALIZAR
+    public UsuarioResponse updateUser(Long id, UsuarioRegisterDTO dto) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // ✔ Evita que un usuario cambie su email a uno que ya está ocupado
+        if (!usuario.getEmail().equals(dto.getEmail()) &&
+                usuarioRepository.existsByEmail(dto.getEmail())) {
+            throw new RuntimeException("El correo ya está registrado por otro usuario");
+        }
+
+        // ✔ Evita que un usuario cambie su RUT a uno repetido
+        if (!usuario.getRut().equals(dto.getRut()) &&
+                usuarioRepository.existsByRut(dto.getRut())) {
+            throw new RuntimeException("El RUT ya está registrado por otro usuario");
+        }
+
+        usuario.setNombre(dto.getNombre());
+        usuario.setApodo(dto.getApodo());
+        usuario.setRut(dto.getRut());
+        usuario.setEmail(dto.getEmail());
+        usuario.setPassword(dto.getPassword());
+        usuario.setTelefono(dto.getTelefono());
+        usuario.setRegion(dto.getRegion());
+        usuario.setCiudad(dto.getCiudad());
+        usuario.setCalle(dto.getCalle());
+        usuario.setNumeroDireccion(dto.getNumeroDireccion());
+
+        Usuario actualizado = usuarioRepository.save(usuario);
+
+        return UsuarioResponse.from(actualizado);
+    }
+
+    // ELIMINAR
+    public void deleteUser(Long id) {
+        if (!usuarioRepository.existsById(id)) {
+            throw new RuntimeException("Usuario no existe");
+        }
+        usuarioRepository.deleteById(id);
     }
 }
