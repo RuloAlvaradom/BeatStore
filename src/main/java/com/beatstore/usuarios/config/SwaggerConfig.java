@@ -12,6 +12,6 @@ import org.springframework.context.annotation.Configuration;
                 description = "Documentación del microservicio de usuarios para la plataforma BeatStore"
         )
 )
+
 public class SwaggerConfig {
-    // Clase vacía si no se requiere más configuración
 }

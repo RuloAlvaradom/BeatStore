@@ -17,7 +17,7 @@ public class UsuarioResponse {
     private String calle;
     private String numeroDireccion;
 
-    // Método estático que convierte una entidad Usuario → UsuarioResponse
+    // Metodo estatico que convierte una entidad Usuario -> UsuarioResponse
     public static UsuarioResponse from(Usuario usuario) {
         UsuarioResponse res = new UsuarioResponse();
 

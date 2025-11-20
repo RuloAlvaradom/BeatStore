@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "*") // Permite conexión desde tu frontend React
+@CrossOrigin(origins = "*") // Permite conexion desde tu frontend React
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -21,43 +21,33 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // ===============================
-    // 📌 REGISTRO
-    // ===============================
+    // REGISTRO
     @PostMapping("/register")
     public ResponseEntity<UsuarioResponse> registerUser(@RequestBody UsuarioRegisterDTO dto) {
         UsuarioResponse nuevo = usuarioService.register(dto);
         return ResponseEntity.ok(nuevo);
     }
 
-    // ===============================
-    // 📌 LOGIN
-    // ===============================
+    // LOGIN
     @PostMapping("/login")
     public ResponseEntity<UsuarioResponse> login(@RequestBody UsuarioLoginRequest dto) {
         UsuarioResponse usuario = usuarioService.login(dto);
         return ResponseEntity.ok(usuario);
     }
 
-    // ===============================
-    // 📌 LISTAR TODOS
-    // ===============================
+    // LISTAR TODOS
     @GetMapping
     public ResponseEntity<List<UsuarioResponse>> findAll() {
         return ResponseEntity.ok(usuarioService.findAll());
     }
 
-    // ===============================
-    // 📌 BUSCAR POR ID
-    // ===============================
+    // BUSCAR POR ID
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.findById(id));
     }
 
-    // ===============================
-    // 📌 ACTUALIZAR USUARIO
-    // ===============================
+    // ACTUALIZAR USUARIO
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponse> updateUser(
             @PathVariable Long id,
@@ -66,9 +56,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.updateUser(id, dto));
     }
 
-    // ===============================
-    // 📌 ELIMINAR USUARIO
-    // ===============================
+    // ELIMINAR USUARIO
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         usuarioService.deleteUser(id);

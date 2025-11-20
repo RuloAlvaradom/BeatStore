@@ -86,13 +86,13 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // ✔ Evita que un usuario cambie su email a uno que ya está ocupado
+        // Evita que un usuario cambie su email a uno que ya está ocupado
         if (!usuario.getEmail().equals(dto.getEmail()) &&
                 usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("El correo ya está registrado por otro usuario");
         }
 
-        // ✔ Evita que un usuario cambie su RUT a uno repetido
+        // Evita que un usuario cambie su RUT a uno repetido
         if (!usuario.getRut().equals(dto.getRut()) &&
                 usuarioRepository.existsByRut(dto.getRut())) {
             throw new RuntimeException("El RUT ya está registrado por otro usuario");

@@ -38,7 +38,7 @@ public class DataSeeder {
                     usuarioRepository.save(usuario);
                 }
 
-                System.out.println("✔ Usuarios iniciales insertados (BeatStore)");
+                System.out.println("Usuarios iniciales insertados (BeatStore)");
             }
         };
     }
