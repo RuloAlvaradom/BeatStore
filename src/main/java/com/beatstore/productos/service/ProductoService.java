@@ -21,14 +21,6 @@ public class ProductoService {
     // CREAR PRODUCTO
     public ProductoResponse create(ProductoRequest dto) {
 
-        // Validar nombre repetido (opcional)
-        // Si tu negocio requiere evitar duplicados por nombre+marca
-        /*
-        if (productoRepository.existsByNombre(dto.getNombre())) {
-            throw new RuntimeException("Ya existe un producto con este nombre");
-        }
-        */
-
         Producto producto = Producto.builder()
                 .nombre(dto.getNombre())
                 .marca(dto.getMarca())
@@ -40,7 +32,6 @@ public class ProductoService {
                 .build();
 
         Producto guardado = productoRepository.save(producto);
-
         return ProductoResponse.from(guardado);
     }
 
@@ -101,5 +92,21 @@ public class ProductoService {
             throw new RuntimeException("Producto no existe");
         }
         productoRepository.deleteById(id);
+    }
+
+    // DESCONTAR STOCK 
+    public ProductoResponse descontarStock(Long id, int cantidad) {
+
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        if (producto.getStock() < cantidad) {
+            throw new RuntimeException("Stock insuficiente");
+        }
+
+        producto.setStock(producto.getStock() - cantidad);
+        Producto actualizado = productoRepository.save(producto);
+
+        return ProductoResponse.from(actualizado);
     }
 }

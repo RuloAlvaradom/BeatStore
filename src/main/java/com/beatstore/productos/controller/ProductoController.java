@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/productos")
-@CrossOrigin(origins = "*") // Permite conexión desde BeatStore (React)
+@CrossOrigin(origins = "*")
 public class ProductoController {
 
     private final ProductoService productoService;
@@ -19,54 +19,31 @@ public class ProductoController {
         this.productoService = productoService;
     }
 
-    // ===============================
-    // 📌 CREAR PRODUCTO
-    // ===============================
     @PostMapping
     public ResponseEntity<ProductoResponse> create(@RequestBody ProductoRequest dto) {
-        ProductoResponse nuevo = productoService.create(dto);
-        return ResponseEntity.ok(nuevo);
+        return ResponseEntity.ok(productoService.create(dto));
     }
 
-    // ===============================
-    // 📌 LISTAR TODOS LOS PRODUCTOS
-    // ===============================
     @GetMapping
     public ResponseEntity<List<ProductoResponse>> findAll() {
         return ResponseEntity.ok(productoService.findAll());
     }
 
-    // ===============================
-    // 📌 BUSCAR POR ID
-    // ===============================
     @GetMapping("/{id}")
     public ResponseEntity<ProductoResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(productoService.findById(id));
     }
 
-    // ===============================
-    // 📌 BUSCAR POR CATEGORÍA
-    // ===============================
     @GetMapping("/categoria/{categoria}")
-    public ResponseEntity<List<ProductoResponse>> findByCategoria(
-            @PathVariable String categoria) {
-
+    public ResponseEntity<List<ProductoResponse>> findByCategoria(@PathVariable String categoria) {
         return ResponseEntity.ok(productoService.findByCategoria(categoria));
     }
 
-    // ===============================
-    // 📌 BUSCAR POR NOMBRE (contiene)
-    // ===============================
     @GetMapping("/buscar/{nombre}")
-    public ResponseEntity<List<ProductoResponse>> findByNombre(
-            @PathVariable String nombre) {
-
+    public ResponseEntity<List<ProductoResponse>> findByNombre(@PathVariable String nombre) {
         return ResponseEntity.ok(productoService.findByNombre(nombre));
     }
 
-    // ===============================
-    // 📌 ACTUALIZAR PRODUCTO
-    // ===============================
     @PutMapping("/{id}")
     public ResponseEntity<ProductoResponse> update(
             @PathVariable Long id,
@@ -75,12 +52,18 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.update(id, dto));
     }
 
-    // ===============================
-    // 📌 ELIMINAR PRODUCTO
-    // ===============================
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productoService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // DESCONTAR STOCK 
+    @PutMapping("/descontar/{id}")
+    public ResponseEntity<ProductoResponse> descontar(
+            @PathVariable Long id,
+            @RequestParam int cantidad) {
+
+        return ResponseEntity.ok(productoService.descontarStock(id, cantidad));
     }
 }
