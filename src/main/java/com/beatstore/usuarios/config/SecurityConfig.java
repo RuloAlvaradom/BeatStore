@@ -14,7 +14,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable()) // Desactiva CSRF
+                .csrf(csrf -> csrf.disable()) //Desactiva CSRF
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/swagger-ui/**",
@@ -23,7 +23,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().permitAll()
                 )
-                .cors(cors -> cors.disable()); // Manejo CORS externo con @CrossOrigin
+                .cors(cors -> cors.disable()); //Manejo CORS externo con @CrossOrigin
 
         return http.build();
     }

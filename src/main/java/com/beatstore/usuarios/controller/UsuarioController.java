@@ -3,8 +3,8 @@ package com.beatstore.usuarios.controller;
 import com.beatstore.usuarios.dto.UsuarioLoginRequest;
 import com.beatstore.usuarios.dto.UsuarioRegisterDTO;
 import com.beatstore.usuarios.dto.UsuarioResponse;
-import com.beatstore.usuarios.model.Usuario;
 import com.beatstore.usuarios.service.UsuarioService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "*") // Permite conexion desde tu frontend React
+@CrossOrigin(origins = "*")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -21,33 +21,31 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // REGISTRO
+    //REGISTRO 
     @PostMapping("/register")
     public ResponseEntity<UsuarioResponse> registerUser(@RequestBody UsuarioRegisterDTO dto) {
-        UsuarioResponse nuevo = usuarioService.register(dto);
-        return ResponseEntity.ok(nuevo);
+        return ResponseEntity.ok(usuarioService.register(dto));
     }
 
-    // LOGIN
+    //LOGIN
     @PostMapping("/login")
     public ResponseEntity<UsuarioResponse> login(@RequestBody UsuarioLoginRequest dto) {
-        UsuarioResponse usuario = usuarioService.login(dto);
-        return ResponseEntity.ok(usuario);
+        return ResponseEntity.ok(usuarioService.login(dto));
     }
 
-    // LISTAR TODOS
+    //LISTAR
     @GetMapping
     public ResponseEntity<List<UsuarioResponse>> findAll() {
         return ResponseEntity.ok(usuarioService.findAll());
     }
 
-    // BUSCAR POR ID
+    //BUSCAR POR ID 
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.findById(id));
     }
 
-    // ACTUALIZAR USUARIO
+    //ACTUALIZAR 
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponse> updateUser(
             @PathVariable Long id,
@@ -56,10 +54,18 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.updateUser(id, dto));
     }
 
-    // ELIMINAR USUARIO
+    //ELIMINAR
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         usuarioService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    //CONEXION CON MICROSERVICIO PRODUCTOS
+    @GetMapping("/producto/{idProducto}")
+    public ResponseEntity<String> consultarProducto(@PathVariable Long idProducto) {
+        return ResponseEntity.ok(
+                usuarioService.consultarProductoDesdeMicroservicio(idProducto)
+        );
     }
 }

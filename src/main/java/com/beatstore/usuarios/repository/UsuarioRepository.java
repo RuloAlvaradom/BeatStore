@@ -9,12 +9,12 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     
-    // Buscar por email (para login)
+    //Buscar por email (para login)
     Optional<Usuario> findByEmail(String email);
 
-    // Validar si un email ya existe
+    //Validar si un email ya existe
     boolean existsByEmail(String email);
 
-    // Validar si un RUT ya existe
+    //Validar si un RUT ya existe
     boolean existsByRut(String rut);
 }

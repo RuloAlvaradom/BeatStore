@@ -24,18 +24,17 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Datos básicos
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
     @NotBlank(message = "El apodo es obligatorio")
     private String apodo;
 
-    // Identificación
+    //Identificacion
     @NotBlank(message = "El RUT es obligatorio")
     private String rut;
 
-    // Contacto
+    //Contacto
     @NotBlank(message = "El teléfono es obligatorio")
     private String telefono;
 
@@ -43,7 +42,7 @@ public class Usuario {
     @NotBlank(message = "El correo es obligatorio")
     private String email;
 
-    // Dirección
+    //Direccion
     @NotBlank(message = "La región es obligatoria")
     private String region;
 
@@ -56,7 +55,7 @@ public class Usuario {
     @NotBlank(message = "El número de dirección es obligatorio")
     private String numeroDireccion;
 
-    // Seguridad
+    //Seguridad
     @NotBlank(message = "La contraseña no puede estar vacía")
     @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;

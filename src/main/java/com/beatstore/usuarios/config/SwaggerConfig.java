@@ -8,8 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @OpenAPIDefinition(
         info = @Info(
                 title = "BeatStore - Microservicio de Usuarios",
-                version = "2.0",
-                description = "Documentación del microservicio de usuarios para la plataforma BeatStore"
+                version = "2.0"
         )
 )
 

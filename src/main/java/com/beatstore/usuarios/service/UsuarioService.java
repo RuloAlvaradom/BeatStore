@@ -6,6 +6,8 @@ import com.beatstore.usuarios.dto.UsuarioResponse;
 import com.beatstore.usuarios.model.Usuario;
 import com.beatstore.usuarios.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,20 +17,22 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final RestTemplate restTemplate;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, RestTemplate restTemplate) {
         this.usuarioRepository = usuarioRepository;
+        this.restTemplate = restTemplate;
     }
 
-    // REGISTRAR USUARIO
+    //CRUD USUARIOS
+
+    //REGISTRAR USUARIO
     public UsuarioResponse register(UsuarioRegisterDTO dto) {
 
-        // EMAIL repetido
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("El correo ya está registrado");
         }
 
-        // RUT repetido
         if (usuarioRepository.existsByRut(dto.getRut())) {
             throw new RuntimeException("El RUT ya está registrado");
         }
@@ -50,13 +54,12 @@ public class UsuarioService {
         return UsuarioResponse.from(guardado);
     }
 
-    // LOGIN
+    //LOGIN
     public UsuarioResponse login(UsuarioLoginRequest dto) {
 
         Usuario usuario = usuarioRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Evitar NullPointerException
         if (usuario.getPassword() == null || !usuario.getPassword().equals(dto.getPassword())) {
             throw new RuntimeException("Contraseña incorrecta");
         }
@@ -64,7 +67,7 @@ public class UsuarioService {
         return UsuarioResponse.from(usuario);
     }
 
-    // LISTAR TODOS
+    //LISTAR TODOS
     public List<UsuarioResponse> findAll() {
         return usuarioRepository.findAll()
                 .stream()
@@ -72,7 +75,7 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
-    // BUSCAR POR ID
+    //BUSCAR POR ID
     public UsuarioResponse findById(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -80,19 +83,17 @@ public class UsuarioService {
         return UsuarioResponse.from(usuario);
     }
 
-    // ACTUALIZAR
+    //ACTUALIZAR
     public UsuarioResponse updateUser(Long id, UsuarioRegisterDTO dto) {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Evita que un usuario cambie su email a uno que ya está ocupado
         if (!usuario.getEmail().equals(dto.getEmail()) &&
                 usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("El correo ya está registrado por otro usuario");
         }
 
-        // Evita que un usuario cambie su RUT a uno repetido
         if (!usuario.getRut().equals(dto.getRut()) &&
                 usuarioRepository.existsByRut(dto.getRut())) {
             throw new RuntimeException("El RUT ya está registrado por otro usuario");
@@ -114,11 +115,32 @@ public class UsuarioService {
         return UsuarioResponse.from(actualizado);
     }
 
-    // ELIMINAR
+    //ELIMINAR
     public void deleteUser(Long id) {
         if (!usuarioRepository.existsById(id)) {
             throw new RuntimeException("Usuario no existe");
         }
         usuarioRepository.deleteById(id);
+    }
+
+    //MICROSERVICIO PRODUCTOS
+
+    public String consultarProductoDesdeMicroservicio(Long idProducto) {
+
+        String url = "http://localhost:8081/api/productos/" + idProducto;
+
+        try {
+            ResponseEntity<String> respuesta =
+                    restTemplate.getForEntity(url, String.class);
+
+            if (respuesta.getStatusCode().is2xxSuccessful()) {
+                return respuesta.getBody();
+            }
+
+            return "Producto no encontrado";
+
+        } catch (Exception e) {
+            return "Error conectando con microservicio PRODUCTOS: " + e.getMessage();
+        }
     }
 }
