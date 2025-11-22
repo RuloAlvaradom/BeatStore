@@ -18,7 +18,7 @@ public class ProductoService {
         this.productoRepository = productoRepository;
     }
 
-    // CREAR PRODUCTO
+    //CREAR PRODUCTO
     public ProductoResponse create(ProductoRequest dto) {
 
         Producto producto = Producto.builder()
@@ -35,7 +35,7 @@ public class ProductoService {
         return ProductoResponse.from(guardado);
     }
 
-    // LISTAR TODOS
+    //LISTAR TODOS
     public List<ProductoResponse> findAll() {
         return productoRepository.findAll()
                 .stream()
@@ -43,7 +43,7 @@ public class ProductoService {
                 .collect(Collectors.toList());
     }
 
-    // BUSCAR POR ID
+    //BUSCAR POR ID
     public ProductoResponse findById(Long id) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
@@ -51,7 +51,7 @@ public class ProductoService {
         return ProductoResponse.from(producto);
     }
 
-    // BUSCAR POR CATEGORIA
+    //BUSCAR POR CATEGORIA
     public List<ProductoResponse> findByCategoria(String categoria) {
         return productoRepository.findByCategoria(categoria)
                 .stream()
@@ -59,7 +59,7 @@ public class ProductoService {
                 .collect(Collectors.toList());
     }
 
-    // BUSCAR POR NOMBRE (contiene)
+    //BUSCAR POR NOMBRE
     public List<ProductoResponse> findByNombre(String nombre) {
         return productoRepository.findByNombreContainingIgnoreCase(nombre)
                 .stream()
@@ -67,7 +67,7 @@ public class ProductoService {
                 .collect(Collectors.toList());
     }
 
-    // ACTUALIZAR PRODUCTO
+    //ACTUALIZAR PRODUCTO
     public ProductoResponse update(Long id, ProductoRequest dto) {
 
         Producto producto = productoRepository.findById(id)
@@ -86,7 +86,7 @@ public class ProductoService {
         return ProductoResponse.from(actualizado);
     }
 
-    // ELIMINAR PRODUCTO
+    //ELIMINAR PRODUCTO
     public void delete(Long id) {
         if (!productoRepository.existsById(id)) {
             throw new RuntimeException("Producto no existe");
@@ -94,7 +94,7 @@ public class ProductoService {
         productoRepository.deleteById(id);
     }
 
-    // DESCONTAR STOCK 
+    //DESCONTAR STOCK 
     public ProductoResponse descontarStock(Long id, int cantidad) {
 
         Producto producto = productoRepository.findById(id)

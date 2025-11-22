@@ -9,9 +9,9 @@ import java.util.List;
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
     
-    // Buscar productos por categoría 
+    //Buscar productos por categoria 
     List<Producto> findByCategoria(String categoria);
 
-    // Búsqueda por nombre parcial (para buscador)
+    //Busqueda por nombre parcial
     List<Producto> findByNombreContainingIgnoreCase(String nombre);
 }

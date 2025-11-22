@@ -23,7 +23,6 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Información principal
     @NotBlank(message = "El nombre del producto es obligatorio")
     private String nombre;
 
@@ -33,22 +32,22 @@ public class Producto {
     @NotBlank(message = "La categoría es obligatoria")
     private String categoria;
 
-    // Precio
+    //Precio
     @NotNull(message = "El precio no puede ser nulo")
     @Positive(message = "El precio debe ser mayor que cero")
     private Double precio;
 
-    // Stock
+    //Stock
     @NotNull(message = "El stock no puede ser nulo")
     @Positive(message = "El stock debe ser mayor o igual a 1")
     private Integer stock;
 
-    // Descripción
+    //Descripcion
     @NotBlank(message = "La descripción es obligatoria")
     @Column(length = 1000)
     private String descripcion;
 
-    // Imagen (URL o ruta)
+    //Imagen
     @NotBlank(message = "La imagen es obligatoria")
     private String imagen;
 }
