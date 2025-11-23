@@ -1,16 +1,17 @@
 package com.beatstore.usuarios.service;
 
+import com.beatstore.usuarios.dto.AuthResponse;
 import com.beatstore.usuarios.dto.UsuarioLoginRequest;
 import com.beatstore.usuarios.dto.UsuarioRegisterDTO;
 import com.beatstore.usuarios.dto.UsuarioResponse;
 import com.beatstore.usuarios.model.Usuario;
 import com.beatstore.usuarios.repository.UsuarioRepository;
+import com.beatstore.usuarios.security.JwtService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,15 +19,18 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final RestTemplate restTemplate;
+    private final JwtService jwtService;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, RestTemplate restTemplate) {
+    public UsuarioService(UsuarioRepository usuarioRepository,
+                          RestTemplate restTemplate,
+                          JwtService jwtService) {
+
         this.usuarioRepository = usuarioRepository;
         this.restTemplate = restTemplate;
+        this.jwtService = jwtService;
     }
 
-    //CRUD USUARIOS
-
-    //REGISTRAR USUARIO
+    //REGISTRO
     public UsuarioResponse register(UsuarioRegisterDTO dto) {
 
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
@@ -49,22 +53,32 @@ public class UsuarioService {
         usuario.setCalle(dto.getCalle());
         usuario.setNumeroDireccion(dto.getNumeroDireccion());
 
+        //Si no viene rol queda en: USER por defecto
+        usuario.setRol(dto.getRol() != null ? dto.getRol() : "USER");
+
         Usuario guardado = usuarioRepository.save(usuario);
 
         return UsuarioResponse.from(guardado);
     }
 
-    //LOGIN
-    public UsuarioResponse login(UsuarioLoginRequest dto) {
+    //LOGIN con JWT
+    public AuthResponse login(UsuarioLoginRequest dto) {
 
         Usuario usuario = usuarioRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (usuario.getPassword() == null || !usuario.getPassword().equals(dto.getPassword())) {
+        if (!usuario.getPassword().equals(dto.getPassword())) {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        return UsuarioResponse.from(usuario);
+        //Generar token JWT
+        String token = jwtService.generarToken(usuario.getEmail(), usuario.getRol());
+
+        return new AuthResponse(
+                token,
+                usuario.getEmail(),
+                usuario.getRol()
+        );
     }
 
     //LISTAR TODOS
@@ -110,6 +124,9 @@ public class UsuarioService {
         usuario.setCalle(dto.getCalle());
         usuario.setNumeroDireccion(dto.getNumeroDireccion());
 
+        //Si el rol cambia, lo actualizamos
+        if (dto.getRol() != null) usuario.setRol(dto.getRol());
+
         Usuario actualizado = usuarioRepository.save(usuario);
 
         return UsuarioResponse.from(actualizado);
@@ -124,7 +141,6 @@ public class UsuarioService {
     }
 
     //MICROSERVICIO PRODUCTOS
-
     public String consultarProductoDesdeMicroservicio(Long idProducto) {
 
         String url = "http://localhost:8081/api/productos/" + idProducto;

@@ -24,6 +24,7 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //Datos personales
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
@@ -59,4 +60,8 @@ public class Usuario {
     @NotBlank(message = "La contraseña no puede estar vacía")
     @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
+
+    //Rol usuario JWT
+    @NotBlank(message = "El rol es obligatorio")
+    private String rol;  
 }

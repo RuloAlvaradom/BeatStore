@@ -5,17 +5,16 @@ import lombok.Setter;
 
 @Getter @Setter
 public class UsuarioRegisterDTO {
-
     private String nombre;
     private String apodo;
     private String rut;
     private String telefono;
     private String email;
-
     private String region;
     private String ciudad;
     private String calle;
     private String numeroDireccion;
-
     private String password;
+    private String rol;
 }
+
