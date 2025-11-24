@@ -7,12 +7,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    //filtro que valida los tokens jwt en cada peticion
     private final JwtAuthFilter jwtAuthFilter;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
@@ -22,16 +22,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
-                //desactiva csrf para usar api rest
+        return http
+                //Desactiva CSRF para APIs REST
                 .csrf(csrf -> csrf.disable())
 
-                //desactiva cors aqui porque usamos @CrossOrigin directamente en los controladores
-                .cors(cors -> cors.disable())
+                // Habilita CORS correctamente (Swagger lo necesita)
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.addAllowedOriginPattern("*"); // Permite Swagger, React, etc.
+                    config.addAllowedMethod("*");
+                    config.addAllowedHeader("*");
+                    config.setAllowCredentials(true);
+                    return config;
+                }))
 
-                //configurar permisos de acceso
+                //Permisos de rutas
                 .authorizeHttpRequests(auth -> auth
-                        //rutas publicas que no necesitan token
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
@@ -39,12 +45,12 @@ public class SecurityConfig {
                                 "/api/usuarios/register",
                                 "/api/usuarios/login"
                         ).permitAll()
-                        //cualquier otra ruta requiere estar autenticado
                         .anyRequest().authenticated()
                 )
-                //agregar el filtro jwt para que se ejecute antes del filtro normal de login
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        //construir la configuracion final
-        return http.build();
+
+                //Filtro JWT antes del filtro de autenticación por formulario
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
+                .build();
     }
 }
