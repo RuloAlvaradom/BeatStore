@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                title = "BeatStore - Microservicio de Usuarios"
+                title = "BeatStore Microservicio de Compras"
         )
 )
 
