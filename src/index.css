@@ -1,0 +1,570 @@
+/* ============================================================
+   ESTILO GENERAL - MEJORAS RESPONSIVAS
+   ============================================================ */
+:root {
+  --beat-blue: rgb(44, 179, 255);   
+  --beat-coral: rgb(255, 255, 255);
+  --beat-gray: #000000;
+  --beat-light: #e9e9e9;
+  --beat-shadow: rgba(0, 0, 0, 0.3);
+  
+  /* Breakpoints para responsive */
+  --mobile: 576px;
+  --tablet: 768px;
+  --desktop: 992px;
+  --large: 1200px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background-color: #161616;
+  color: #fcfcfc;
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   NAVBAR RESPONSIVA
+   ============================================================ */
+.navbar {
+  background-color: var(--beat-gray) !important;
+  box-shadow: 0 2px 6px var(--beat-shadow);
+  padding: 0.8rem 1rem;
+}
+
+.navbar-brand img {
+  transition: transform 0.3s ease;
+  max-height: 40px;
+  width: auto;
+}
+
+.navbar-toggler {
+  border: 1px solid var(--beat-blue);
+  padding: 0.25rem 0.5rem;
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 2px rgba(44, 179, 255, 0.25);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* ============================================================
+   CARRUSEL PRINCIPAL RESPONSIVO
+   ============================================================ */
+.carousel {
+  margin-bottom: 2rem;
+}
+
+.carousel-item img {
+  height: 60vh;
+  min-height: 300px;
+  max-height: 500px;
+  object-fit: cover;
+  filter: brightness(70%) contrast(1.1);
+}
+
+.carousel-caption {
+  background-color: rgba(0, 0, 0, 0.65);
+  border-left: 4px solid var(--beat-coral);
+  padding: 15px 20px;
+  border-radius: 8px;
+  bottom: 20px;
+  left: 10%;
+  right: 10%;
+  text-align: center;
+}
+
+.carousel-caption h3 {
+  color: var(--beat-blue);
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.carousel-caption p {
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+/* ============================================================
+   CUADRO DE BIENVENIDA RESPONSIVO
+   ============================================================ */
+.welcome-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 2rem 1.5rem;
+  max-width: 90%;
+  margin: 0 auto 3rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  animation: fadeInUp 1s ease;
+}
+
+/* ============================================================
+   TÍTULOS DE SECCIÓN RESPONSIVOS
+   ============================================================ */
+.section-title {
+  font-weight: 600;
+  color: #f5f5f5;
+  letter-spacing: 1px;
+  text-align: center;
+  position: relative;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  font-size: 1.75rem;
+  padding: 0 1rem;
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--beat-blue), var(--beat-coral));
+  box-shadow: 0 0 8px rgba(44, 179, 255, 0.4);
+}
+
+/* ============================================================
+   PRODUCTOS / OFERTAS RESPONSIVAS
+   ============================================================ */
+.card {
+  background-color: #131313;
+  border: none;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  color: #fff;
+  margin-bottom: 1.5rem;
+  height: 100%;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px var(--beat-shadow);
+}
+
+.card img {
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+  width: 100%;
+}
+
+.card-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 200px);
+}
+
+.card .card-title {
+  color: var(--beat-blue) !important;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-text {
+  flex-grow: 1;
+  margin-bottom: 1rem;
+}
+
+.precio-oferta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.precio-linea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.precio-anterior {
+  color: #e44646;
+  text-decoration: line-through;
+  font-size: 0.95rem;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.precio-descuento {
+  color: #4debe0;
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+/* ============================================================
+   FORMULARIOS DE AUTENTICACIÓN RESPONSIVOS
+   ============================================================ */
+.auth-container {
+  max-width: 90%;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.auth-form {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  animation: fadeInUp 0.8s ease;
+}
+
+.auth-form h2 {
+  color: var(--beat-blue);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  font-size: 1.75rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================================
+   PERFIL DE USUARIO RESPONSIVO
+   ============================================================ */
+.perfil-container {
+  max-width: 90%;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.perfil-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  padding: 1.5rem;
+}
+
+.perfil-titulo {
+  color: var(--beat-blue);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* ============================================================
+   CARRITO DE COMPRAS RESPONSIVO
+   ============================================================ */
+.table-responsive {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table {
+  background-color: #181818;
+  color: #fff;
+  margin-bottom: 0;
+}
+
+.table thead {
+  background: var(--beat-blue);
+  color: white !important;
+}
+
+/* ============================================================
+   MARCAS RESPONSIVAS
+   ============================================================ */
+.marcas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 0 1rem;
+}
+
+.marca-tarjeta {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.03);
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.marca-tarjeta img {
+  max-width: 70px;
+  filter: brightness(90%) grayscale(80%);
+  transition: all 0.3s ease;
+}
+
+/* ============================================================
+   MEDIA QUERIES PARA DISPOSITIVOS MÓVILES
+   ============================================================ */
+
+/* Teléfonos pequeños (hasta 576px) */
+@media (max-width: 576px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .navbar-brand img {
+    max-height: 35px;
+  }
+  
+  .carousel-item img {
+    height: 40vh;
+    min-height: 250px;
+  }
+  
+  .carousel-caption {
+    padding: 10px 15px;
+    bottom: 10px;
+    left: 5%;
+    right: 5%;
+  }
+  
+  .carousel-caption h3 {
+    font-size: 1.2rem;
+  }
+  
+  .carousel-caption p {
+    font-size: 0.8rem;
+    display: none; /* Ocultar descripción en móviles muy pequeños */
+  }
+  
+  .welcome-box {
+    padding: 1.5rem 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .card img {
+    height: 180px;
+  }
+  
+  .auth-form {
+    padding: 1.5rem 1rem;
+  }
+  
+  .perfil-card {
+    padding: 1rem;
+  }
+  
+  .marca-tarjeta {
+    width: 85px;
+    height: 85px;
+  }
+  
+  .marca-tarjeta img {
+    max-width: 60px;
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Teléfonos medianos y tablets pequeñas (577px - 768px) */
+@media (min-width: 577px) and (max-width: 768px) {
+  .carousel-item img {
+    height: 50vh;
+  }
+  
+  .carousel-caption {
+    left: 8%;
+    right: 8%;
+  }
+  
+  .card img {
+    height: 220px;
+  }
+  
+  .marcas {
+    gap: 20px;
+  }
+  
+  .marca-tarjeta {
+    width: 110px;
+    height: 110px;
+  }
+}
+
+/* Tablets (769px - 992px) */
+@media (min-width: 769px) and (max-width: 992px) {
+  .carousel-item img {
+    height: 55vh;
+  }
+  
+  .card img {
+    height: 200px;
+  }
+}
+
+/* ============================================================
+   MEJORAS ESPECÍFICAS PARA ELEMENTOS CRÍTICOS EN MÓVIL
+   ============================================================ */
+
+/* Mejorar espaciado en móviles */
+.container, .container-fluid {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Asegurar que los botones sean táctiles en móviles */
+.btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+}
+
+/* Mejorar legibilidad del texto en móviles */
+p, li, .card-text {
+  line-height: 1.6;
+}
+
+/* Ajustar tablas para móviles */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+  
+  .table th, .table td {
+    padding: 0.5rem;
+  }
+}
+
+/* Ajustar grid de productos para móviles */
+@media (max-width: 576px) {
+  .row {
+    margin-left: -8px;
+    margin-right: -8px;
+  }
+  
+  .col, [class*="col-"] {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+/* Mejorar formularios en móviles */
+.form-control, .form-select {
+  min-height: 44px;
+  font-size: 16px; /* Previene zoom en iOS */
+}
+
+/* Ajustar toast para móviles */
+.toast-container {
+  bottom: 1rem;
+  right: 1rem;
+  left: 1rem;
+}
+
+.toast {
+  max-width: 100%;
+}
+
+/* ============================================================
+   UTILIDADES RESPONSIVAS ADICIONALES
+   ============================================================ */
+
+/* Ocultar/mostrar elementos según el dispositivo */
+.d-mobile-only {
+  display: none;
+}
+
+.d-desktop-only {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .d-mobile-only {
+    display: block;
+  }
+  
+  .d-desktop-only {
+    display: none;
+  }
+}
+
+/* Texto responsivo */
+.text-responsive {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+/* Imágenes responsivas */
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ============================================================
+   ANIMACIONES (sin cambios)
+   ============================================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cartPop {
+  0%   { transform: scale(1); box-shadow: 0 0 0 transparent; }
+  30%  { transform: scale(1.15); box-shadow: 0 0 15px var(--beat-coral); }
+  60%  { transform: scale(0.95); }
+  100% { transform: scale(1); box-shadow: 0 0 0 transparent; }
+}
+
+/* ============================================================
+   FOOTER RESPONSIVO
+   ============================================================ */
+footer {
+  background-color: var(--beat-gray);
+  color: #525252;
+  text-align: center;
+  padding: 1.5rem 0;
+  font-size: 0.9rem;
+  border-top: 2px solid var(--beat-coral);
+  margin-top: auto;
+}
+
+@media (max-width: 576px) {
+  footer {
+    padding: 1rem 0;
+    font-size: 0.8rem;
+  }
+}
