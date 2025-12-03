@@ -4,7 +4,7 @@ import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import { useLogin } from "../hooks/ContextLogin";
 
 export default function Registro() {
-  const { registrarUsuario } = useLogin();
+  const { registrarUsuario } = useLogin(); // Quizás necesite ajustes
   const navigate = useNavigate();
 
   const regionesDeChile = [
@@ -42,6 +42,7 @@ export default function Registro() {
 
   const [error, setError] = useState("");
   const [exito, setExito] = useState("");
+  const [cargando, setCargando] = useState(false); // Nuevo estado para carga
 
   const handleChange = (e) => {
     setFormData({
@@ -73,10 +74,11 @@ export default function Registro() {
     return regex.test(telefono);
   };
 
-  const manejarRegistro = (e) => {
+  const manejarRegistro = async (e) => { // Cambiar a async
     e.preventDefault();
     setError("");
     setExito("");
+    setCargando(true);
 
     const {
       nombre,
@@ -104,30 +106,100 @@ export default function Registro() {
       !numeroCasa
     ) {
       setError("Por favor, completa todos los campos obligatorios.");
+      setCargando(false);
       return;
     }
 
     // Validación RUT
     if (!validarRut(rut)) {
       setError("El RUT ingresado no es válido.");
+      setCargando(false);
       return;
     }
 
     // Validación teléfono
     if (!validarTelefono(telefono)) {
       setError("El número de teléfono debe ser chileno y tener formato válido (+569XXXXXXXX).");
+      setCargando(false);
       return;
     }
 
     // Validación contraseñas
     if (password !== confirmarPassword) {
       setError("Las contraseñas no coinciden.");
+      setCargando(false);
       return;
     }
 
-    registrarUsuario(formData);
-    setExito("Registro exitoso. Redirigiendo...");
-    setTimeout(() => navigate("/perfil"), 1500);
+    try {
+      // Preparar datos para enviar al backend
+      const datosRegistro = {
+          nombre,
+          apodo: formData.apodo || "", // Enviar vacío si no hay apodo
+          rut,
+          telefono,
+          email,
+          password,
+          direccion: {
+          region,
+          ciudad,
+          calle,
+          numeroCasa,
+        }
+      };
+
+      const respuestaer = await fetch("http://100.30.153.63:8080/api/usuarios/register", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(datosRegistro),
+  mode: 'cors' // Asegura modo CORS
+});
+
+console.log("Status:", respuestaer.status);
+console.log("Status Text:", respuestaer.statusText);
+
+// Lee la respuesta aunque sea 403
+try {
+  const errorText = await respuesta.text();
+  console.log("Error response:", errorText);
+} catch(e) {
+  console.log("No se pudo leer respuesta de error",e);
+}
+      // Llamada al backend
+      const respuesta = await fetch("http://100.30.153.63:8080/api/usuarios/register", { // Cambiar URL según backend
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(datosRegistro),
+      });
+
+      const data = await respuesta.json();
+
+      if (!respuesta.ok) {
+        throw new Error(data.message || "Error en el registro");
+      }
+
+      // Si el registro es exitoso
+      if (data.usuario) {
+        registrarUsuario(data.usuario);
+        
+        // Guardar token
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+        
+        setExito("Registro exitoso. Redirigiendo...");
+        setTimeout(() => navigate("/perfil"), 1500);
+      }
+
+    } catch (err) {
+      setError(err.message || "Error al conectar con el servidor");
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
@@ -150,6 +222,7 @@ export default function Registro() {
                   placeholder="Ej: Raúl Alvarado"
                   value={formData.nombre}
                   onChange={handleChange}
+                  disabled={cargando} // Deshabilitar durante carga
                 />
               </Form.Group>
             </Col>
@@ -162,6 +235,7 @@ export default function Registro() {
                   placeholder="Ej: ElGuitarrista"
                   value={formData.apodo}
                   onChange={handleChange}
+                  disabled={cargando}
                 />
               </Form.Group>
             </Col>
@@ -177,6 +251,7 @@ export default function Registro() {
                   placeholder="Ej: 12.345.678-9"
                   value={formData.rut}
                   onChange={handleChange}
+                  disabled={cargando}
                 />
               </Form.Group>
             </Col>
@@ -189,6 +264,7 @@ export default function Registro() {
                   placeholder="Ej: +56 9 12345678"
                   value={formData.telefono}
                   onChange={handleChange}
+                  disabled={cargando}
                 />
               </Form.Group>
             </Col>
@@ -205,6 +281,7 @@ export default function Registro() {
                   placeholder="ejemplo@correo.com"
                   value={formData.email}
                   onChange={handleChange}
+                  disabled={cargando}
                 />
               </Form.Group>
             </Col>
@@ -217,6 +294,7 @@ export default function Registro() {
                   placeholder="Crea una contraseña"
                   value={formData.password}
                   onChange={handleChange}
+                  disabled={cargando}
                 />
               </Form.Group>
             </Col>
@@ -229,6 +307,7 @@ export default function Registro() {
                   placeholder="Repite tu contraseña"
                   value={formData.confirmarPassword}
                   onChange={handleChange}
+                  disabled={cargando}
                   isInvalid={
                     formData.password &&
                     formData.confirmarPassword &&
@@ -251,6 +330,7 @@ export default function Registro() {
                   name="region"
                   value={formData.region}
                   onChange={handleChange}
+                  disabled={cargando}
                 >
                   <option value="">Selecciona tu región</option>
                   {regionesDeChile.map((reg) => (
@@ -271,6 +351,7 @@ export default function Registro() {
                   placeholder="Ej: Santiago"
                   value={formData.ciudad}
                   onChange={handleChange}
+                  disabled={cargando}
                 />
               </Form.Group>
             </Col>
@@ -286,6 +367,7 @@ export default function Registro() {
                   placeholder="Ej: Av. Providencia"
                   value={formData.calle}
                   onChange={handleChange}
+                  disabled={cargando}
                 />
               </Form.Group>
             </Col>
@@ -298,13 +380,19 @@ export default function Registro() {
                   placeholder="Ej: 1234"
                   value={formData.numeroCasa}
                   onChange={handleChange}
+                  disabled={cargando}
                 />
               </Form.Group>
             </Col>
           </Row>
 
-          <Button type="submit" variant="primary" className="w-100 mt-3">
-            Registrarse
+          <Button 
+            type="submit" 
+            variant="primary" 
+            className="w-100 mt-3"
+            disabled={cargando}
+          >
+            {cargando ? "Registrando..." : "Registrarse"}
           </Button>
         </Form>
 

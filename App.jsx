@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Router, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import NavbarBeatStore from "./components/NavbarBeatStore";
@@ -57,6 +57,7 @@ export default function App() {
 
       {/* Contenido principal */}
       <main className="flex-grow-1">
+        <Router> 
         <Routes>
           {/* Páginas principales */}
           <Route path="/" element={<Home />} />
@@ -101,6 +102,7 @@ export default function App() {
           {/* Enrutamiento a pagos */}
           <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
+        </Router> 
       </main>
 
       {/* Footer y notificaciones */}

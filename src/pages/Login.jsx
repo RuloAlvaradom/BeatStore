@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
+import { Form, Button, Container, Alert } from "react-bootstrap";
 import { useLogin } from "../hooks/ContextLogin";
 
 export default function Login() {
-  const { iniciarSesion } = useLogin();
+  const { iniciarSesion, autenticado } = useLogin();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -14,40 +14,87 @@ export default function Login() {
 
   const [error, setError] = useState("");
   const [exito, setExito] = useState("");
+  const [cargando, setCargando] = useState(false);
+
+   useEffect(() => {
+    if (autenticado) {
+      navigate("/");
+    }
+  }, [autenticado, navigate]);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    // Limpiar errores
+    if (error) setError("");
   };
 
-  const manejarLogin = (e) => {
+
+  const manejarLogin = async (e) => {
     e.preventDefault();
     setError("");
     setExito("");
+    setCargando(true);
 
     const { email, password } = formData;
-    if (!email || !password) {
-      setError("Por favor, completa todos los campos.");
+    if (!email.trim()) {
+      setError("Por favor, ingresa tu correo electrónico.");
+      setCargando(false);
+      return;
+    }
+    
+    if (!email.includes('@') || !email.includes('.')) {
+      setError("Por favor, ingresa un correo electrónico válido.");
+      setCargando(false);
+      return;
+    }
+    
+    if (!password) {
+      setError("Por favor, ingresa tu contraseña.");
+      setCargando(false);
       return;
     }
 
-    const usuarioGuardado = localStorage.getItem("usuarioBeatStore");
-    if (!usuarioGuardado) {
-      setError("No se encontró una cuenta registrada. Regístrate primero.");
-      return;
-    }
-
-    const usuario = JSON.parse(usuarioGuardado);
-    if (usuario.email === email && usuario.password === password) {
-      iniciarSesion(usuario);
-      setExito("Inicio de sesión exitoso. Redirigiendo...");
-      setTimeout(() => navigate("/perfil"), 1500);
-    } else {
-      setError("Correo o contraseña incorrectos.");
+    try {
+      const resultado = await iniciarSesion(email, password);
+      
+      if (resultado.exito) {
+        setExito("¡Inicio de sesión exitoso! Redirigiendo...");
+        
+        // Obtener página de redirección desde query params (si existe)
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get('redirect') || "/";
+        
+        // Redirigir después de un breve delay para mostrar mensaje
+        setTimeout(() => navigate(redirectTo), 1500);
+      } else {
+        // Errores más específicos según la respuesta
+        let mensajeError = resultado.error || "Error en el inicio de sesión";
+        
+        // Personalizar mensajes comunes
+        if (mensajeError.includes('Credenciales incorrectas') || 
+            mensajeError.includes('invalid') ||
+            mensajeError.toLowerCase().includes('incorrect')) {
+          mensajeError = "Correo o contraseña incorrectos. Por favor, verifica tus datos.";
+        } else if (mensajeError.includes('network') || mensajeError.includes('conectar')) {
+          mensajeError = "Error de conexión. Por favor, verifica tu internet e intenta de nuevo.";
+        }
+        
+        setError(mensajeError);
+        
+      }
+    } catch (err) {
+      setError(err.message || "Error al conectar con el servidor. Intenta de nuevo más tarde.");
+      
+      // Auto-limpiar error después de 5 segundos
+      setTimeout(() => setError(""), 5000);
+    } finally {
+      setCargando(false);
     }
   };
+  
 
   return (
     <Container className="auth-container">
@@ -58,38 +105,39 @@ export default function Login() {
         {exito && <Alert variant="success">{exito}</Alert>}
 
         <Form onSubmit={manejarLogin}>
-          <Row>
-            <Col md={12}>
-              <Form.Group className="mb-3">
-                <Form.Label>Correo electrónico</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  placeholder="ejemplo@correo.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+          <Form.Group className="mb-3">
+            <Form.Label>Correo electrónico</Form.Label>
+            <Form.Control
+              type="email"
+              name="email"
+              placeholder="ejemplo@correo.com"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={cargando}
+              required
+            />
+          </Form.Group>
 
-          <Row>
-            <Col md={12}>
-              <Form.Group className="mb-3">
-                <Form.Label>Contraseña</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="password"
-                  placeholder="Tu contraseña"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+          <Form.Group className="mb-3">
+            <Form.Label>Contraseña</Form.Label>
+            <Form.Control
+              type="password"
+              name="password"
+              placeholder="Tu contraseña"
+              value={formData.password}
+              onChange={handleChange}
+              disabled={cargando}
+              required
+            />
+          </Form.Group>
 
-          <Button type="submit" variant="primary" className="w-100 mt-2">
-            Iniciar sesión
+          <Button 
+            type="submit" 
+            variant="primary" 
+            className="w-100 mt-2"
+            disabled={cargando}
+          >
+            {cargando ? "Iniciando sesión..." : "Iniciar sesión"}
           </Button>
         </Form>
 

@@ -1,6 +1,7 @@
+import { LoginProvider } from "./hooks/ContextLogin.jsx";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Routes, Route } from "react-router-dom";
-import { ContextLoginProvider } from "./hooks/ContextLogin";
 
 import NavbarBeatStore from "./components/NavbarBeatStore";
 import FooterBeatStore from "./components/FooterBeatStore";
@@ -52,7 +53,7 @@ import CheckoutPage from './pages/CheckoutPage';
 
 export default function App() {
   return (
-    <ContextLoginProvider>
+    <LoginProvider>
       <div className="app-container">
         <NavbarBeatStore />
 
@@ -102,6 +103,6 @@ export default function App() {
         <ToastNotificacion />
         <FooterBeatStore />
       </div>
-    </ContextLoginProvider>
+    </LoginProvider>
   );
 }

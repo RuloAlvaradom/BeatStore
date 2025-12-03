@@ -5,7 +5,7 @@ import { useLogin } from "../hooks/ContextLogin";
 
 export default function NavbarBeatStore() {
   const { cart } = useCarrito();
-  const { usuario, cerrarSesion } = useLogin();
+  const { usuario, autenticado, cerrarSesion } = useLogin();
 
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -70,19 +70,44 @@ export default function NavbarBeatStore() {
             </NavDropdown>
 
             {/* Botones de sesión */}
-            {usuario ? (
-              <>
-                <Nav.Link as={Link} to="/perfil">Mi perfil</Nav.Link>
-                <Nav.Link onClick={cerrarSesion}>Cerrar sesión</Nav.Link>
-              </>
+            {autenticado && usuario ? (
+              <NavDropdown 
+                title={`👤 ${usuario.nombre || usuario.email.split('@')[0]}`} 
+                id="user-dropdown"
+                menuVariant="dark"
+                align="end"
+              >
+                <NavDropdown.Item as={Link} to="/perfil">
+                  Mi Perfil
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/mis-pedidos">
+                  Mis Pedidos
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/configuracion">
+                  Configuración
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item 
+                  onClick={cerrarSesion}
+                  className="text-danger"
+                >
+                  Cerrar Sesión
+                </NavDropdown.Item>
+              </NavDropdown>
             ) : (
               <>
-                <Nav.Link as={Link} to="/login">Iniciar sesión</Nav.Link>
-                <Nav.Link as={Link} to="/registro">Registro</Nav.Link>
+                <Nav.Link as={Link} to="/login">
+                  Iniciar sesión
+                </Nav.Link>
+                <Nav.Link as={Link} to="/registro" className="btn btn ms-2">
+                  Registrarse
+                </Nav.Link>
               </>
             )}
 
             {/* Carrito con contador dinámico */}
+          </Nav>
+        </Navbar.Collapse>
             <Nav.Link as={Link} to="/carrito" className="position-relative">
               🛒 Carrito
               {totalItems > 0 && (
@@ -96,8 +121,6 @@ export default function NavbarBeatStore() {
                 </Badge>
               )}
             </Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
       </Container>
     </Navbar>
   );
