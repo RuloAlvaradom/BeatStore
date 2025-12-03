@@ -1,4 +1,4 @@
-import { LoginProvider } from "./hooks/ContextLogin.jsx";
+import { LoginProvider } from "./hooks/ContextLogin.js";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Routes, Route } from "react-router-dom";

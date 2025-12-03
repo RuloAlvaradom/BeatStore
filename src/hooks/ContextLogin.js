@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { createElement as h } from 'react';
 
-
 // 1. Contexto
 const LoginContext = createContext();
 
@@ -20,8 +19,6 @@ export function LoginProvider({ children }) {
   const [autenticado, setAutenticado] = useState(false);
   const [cargando, setCargando] = useState(true);
 
-  
-
   const cerrarSesion = () => {
     // Limpiar localStorage
     localStorage.removeItem('token');
@@ -32,114 +29,155 @@ export function LoginProvider({ children }) {
     setUsuario(null);
     setAutenticado(false);
     
-    // Opcional: Redirigir a home
+    // Redirigir a home
     window.location.href = '/';
   };
+
+  // SOLO UN useEffect para verificar sesión
   useEffect(() => {
-    const verificarSesion = async () => {
-      const token = localStorage.getItem('token');
-      const usuarioGuardado = localStorage.getItem('usuarioBeatStore');
-      
-      if (!token || !usuarioGuardado) {
-        setCargando(false);
-        return;
-      }
-
-      try {
-        // Parsear usuario
-        const usuarioParsed = JSON.parse(usuarioGuardado);
-        try {
-          const res = await fetch('http://100.30.153.63:8080/api/usuarios/login', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (res.ok) {
-            // Token válido
-            setUsuario(usuarioParsed);
-            setAutenticado(true);
-            
-            // Actualizar timestamp de sesión
-            localStorage.setItem('beatstore_session_time', Date.now().toString());
-          } else {
-            // Token inválido o expirado
-            cerrarSesion();
-          }
-        } catch (error) {
-          console.warn('Error verificando token, usando sesión local:', error);
-          // Si el endpoint no existe, usar sesión local
-          setUsuario(usuarioParsed);
-          setAutenticado(true);
-        }
-      } catch (error) {
-        console.error('Error al parsear usuario:', error);
-        cerrarSesion();
-      } finally {
-        setCargando(false);
-      }
-    };
-    verificarSesion();
-  }, []);
-
-
-  useEffect(() => {
+  const verificarSesion = () => {
     const token = localStorage.getItem('token');
     const usuarioGuardado = localStorage.getItem('usuarioBeatStore');
-    if (token && usuarioGuardado) {
-      try {
-        setUsuario(JSON.parse(usuarioGuardado));
-        setAutenticado(true);
-      } catch {
-        cerrarSesion();
-      }
+    
+    if (!token || !usuarioGuardado) {
+      setCargando(false);
+      return;
     }
-    setCargando(false);
-  }, []);
 
-   const iniciarSesion = async (email, password) => {
+    try {
+      // Parsear usuario
+      const usuarioParsed = JSON.parse(usuarioGuardado);
+      
+      // Verificar expiración (opcional - el token JWT ya tiene expiración)
+      const sessionTime = localStorage.getItem('beatstore_session_time');
+      if (sessionTime) {
+        const ahora = Date.now();
+        const tiempoSesion = ahora - parseInt(sessionTime);
+        const maxDuracion = 24 * 60 * 60 * 1000; // 24 horas
+        
+        if (tiempoSesion > maxDuracion) {
+          cerrarSesion();
+          return;
+        }
+      }
+      
+      // Si el token es JWT, podrías verificar su expiración aquí
+      // Pero por ahora confiamos en localStorage
+      setUsuario(usuarioParsed);
+      setAutenticado(true);
+      
+    } catch (error) {
+      console.error('Error al cargar sesión:', error);
+      cerrarSesion();
+    } finally {
+      setCargando(false);
+    }
+  };
+  
+  verificarSesion();
+}, []);
+
+  // Función para decodificar token JWT
+  const decodificarToken = (token) => {
+    try {
+      // Los tokens JWT tienen 3 partes separadas por puntos
+      const partes = token.split('.');
+      if (partes.length !== 3) return null;
+      
+      // La parte 2 es el payload (datos) en base64
+      const payloadBase64 = partes[1];
+      const payloadJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+      return JSON.parse(payloadJson);
+    } catch (error) {
+      console.error('Error decodificando token:', error);
+      return null;
+    }
+  };
+
+  const iniciarSesion = async (email, password) => {
     try {
       setCargando(true);
       
+      console.log('🔄 Intentando login para:', email);
+      
       const res = await fetch('http://100.30.153.63:8080/api/usuarios/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({ email, password })
       });
       
+      console.log('📊 Status de respuesta:', res.status);
+      
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Credenciales incorrectas');
+        let errorMsg = 'Credenciales incorrectas';
+        try {
+          const errorData = await res.json();
+          errorMsg = errorData.message || errorData.error || errorMsg;
+        } catch {
+          errorMsg = `Error ${res.status}`;
+        }
+        throw new Error(errorMsg);
       }
       
+      // Tu API devuelve: {token, email, rol}
       const data = await res.json();
+      console.log('✅ Respuesta API:', data);
       
-      // Validar que vengan los datos esperados
-      if (!data.token || !data.usuario) {
-        throw new Error('Datos de sesión incompletos');
+      // Validar que vengan los datos mínimos
+      if (!data.token || !data.email) {
+        throw new Error('El servidor no devolvió token o email');
       }
+      
+      // Decodificar token JWT para extraer más información
+      const tokenPayload = decodificarToken(data.token);
+      console.log('🔐 Token decodificado:', tokenPayload);
+      
+      // Crear objeto usuario COMPLETO
+      const usuarioCompleto = {
+        id: tokenPayload?.sub || data.email, // Usar email como ID si no hay ID
+        email: data.email,
+        nombre: tokenPayload?.nombre || email.split('@')[0], // Nombre temporal
+        rol: data.rol || 'USER',
+        token: data.token
+      };
+      
       // Guardar en localStorage
       localStorage.setItem('token', data.token);
-      localStorage.setItem('usuarioBeatStore', JSON.stringify(data.usuario));
+      localStorage.setItem('usuarioBeatStore', JSON.stringify(usuarioCompleto));
       localStorage.setItem('beatstore_session_time', Date.now().toString());
       
       // Actualizar estado
-      setUsuario(data.usuario);
+      setUsuario(usuarioCompleto);
       setAutenticado(true);
+      
+      console.log('🎉 Login exitoso, usuario:', usuarioCompleto);
       
       return { 
         exito: true, 
-        usuario: data.usuario,
+        usuario: usuarioCompleto,
         token: data.token 
       };
       
     } catch (error) {
-      console.error('Error en inicio de sesión:', error);
+      console.error('❌ Error en inicio de sesión:', error);
+      
+      // Mensajes específicos
+      let mensajeError = error.message;
+      
+      if (error.message.includes('Failed to fetch')) {
+        mensajeError = 'No se pudo conectar al servidor. Problema de CORS.';
+        mensajeError += '\n\nPara desarrollo:';
+        mensajeError += '\n1. Instala extensión "Allow CORS" en Chrome';
+        mensajeError += '\n2. Actívala para localhost';
+        mensajeError += '\n3. Intenta de nuevo';
+      }
+      
       return { 
         exito: false, 
-        error: error.message || 'Error al iniciar sesión' 
+        error: mensajeError 
       };
     } finally {
       setCargando(false);
@@ -150,37 +188,65 @@ export function LoginProvider({ children }) {
     try {
       setCargando(true);
       
+      console.log('📝 Registrando usuario...');
       const res = await fetch('http://100.30.153.63:8080/api/usuarios/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datos)
       });
       
+      console.log('📊 Status registro:', res.status);
+      
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error en registro');
+        let errorMsg = 'Error en registro';
+        try {
+          const errorData = await res.json();
+          errorMsg = errorData.message || errorData.error || errorMsg;
+        } catch {
+          errorMsg = `Error ${res.status}`;
+        }
+        throw new Error(errorMsg);
       }
       
-      const usuarioReg = await res.json();
+      let usuarioReg;
+      try {
+        usuarioReg = await res.json();
+      } catch {
+        usuarioReg = { email: datos.email };
+      }
       
-      // Si el registro incluye inicio de sesión automático
-      if (usuarioReg.token && usuarioReg.usuario) {
-        localStorage.setItem('token', usuarioReg.token);
-        localStorage.setItem('usuarioBeatStore', JSON.stringify(usuarioReg.usuario));
+      // La API de registro podría devolver token o no
+      // Si no devuelve token, el usuario deberá hacer login después
+      const token = usuarioReg.token || null;
+      
+      // Crear usuario completo
+      const usuarioCompleto = {
+        id: usuarioReg.id || `user-${Date.now()}`,
+        email: usuarioReg.email || datos.email,
+        nombre: usuarioReg.nombre || usuarioReg.name || datos.nombre || datos.email.split('@')[0],
+        rol: usuarioReg.rol || 'USER',
+        token: token
+      };
+      
+      // Si hay token, guardar sesión automáticamente
+      if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('usuarioBeatStore', JSON.stringify(usuarioCompleto));
         localStorage.setItem('beatstore_session_time', Date.now().toString());
         
-        setUsuario(usuarioReg.usuario);
+        setUsuario(usuarioCompleto);
         setAutenticado(true);
       }
       
       return { 
         exito: true, 
-        usuario: usuarioReg,
-        mensaje: 'Registro exitoso' 
+        usuario: usuarioCompleto,
+        token: token,
+        mensaje: token ? 'Registro y login exitoso' : 'Registro exitoso. Por favor inicia sesión.'
       };
       
     } catch (error) {
-      console.error('Error en registro:', error);
+      console.error('❌ Error en registro:', error);
       return { 
         exito: false, 
         error: error.message || 'Error en el registro' 
@@ -190,7 +256,7 @@ export function LoginProvider({ children }) {
     }
   };
 
-   const actualizarUsuario = (nuevosDatos) => {
+  const actualizarUsuario = (nuevosDatos) => {
     try {
       const usuarioActualizado = { ...usuario, ...nuevosDatos };
       localStorage.setItem('usuarioBeatStore', JSON.stringify(usuarioActualizado));
@@ -201,8 +267,24 @@ export function LoginProvider({ children }) {
       return { exito: false, error: error.message };
     }
   };
+
   // Verificar expiración de sesión
   const verificarExpiracionSesion = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return true;
+    
+    // Verificar expiración JWT primero
+    const tokenPayload = decodificarToken(token);
+    if (tokenPayload && tokenPayload.exp) {
+      const ahora = Math.floor(Date.now() / 1000);
+      if (tokenPayload.exp < ahora) {
+        cerrarSesion();
+        return true;
+      }
+      return false;
+    }
+    
+    // Si no es JWT, usar timestamp de sesión
     const sessionTime = localStorage.getItem('beatstore_session_time');
     if (!sessionTime) return true;
     
@@ -231,6 +313,7 @@ export function LoginProvider({ children }) {
         cerrarSesion,
         actualizarUsuario,
         verificarExpiracionSesion,
+        decodificarToken,
         setUsuario
       }
     },
